@@ -22,7 +22,7 @@ export function ModerateView({ session }: { session: Session }) {
   const [comment, setComment] = useState("");
   const [orderId, setOrderId] = useState("");
   const [memberCode, setMemberCode] = useState("");
-  const [productCode, setProductCode] = useState("lamp");
+  const [productCode, setProductCode] = useState("");
   const [sale, setSale] = useState(1000);
   const [reportId, setReportId] = useState("");
   const [postId, setPostId] = useState("");

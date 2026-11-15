@@ -46,7 +46,7 @@ export function CommunityComposer({
 
   return (
     <form
-      className="rounded-2xl border border-line bg-raise p-4"
+      className="surface-card rounded-[1.4rem] p-4"
       onSubmit={(event) => {
         event.preventDefault();
         const file = fileRef.current?.files?.[0];

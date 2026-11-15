@@ -28,6 +28,7 @@ export function MarketView({ session }: { session: Session }) {
       <h1 className="font-display text-4xl">Products we are allowed to sell</h1>
       <p className="mt-2 text-sm text-muted">{policy}</p>
       {note ? <p className="mt-3 text-sm text-muted">{note}</p> : null}
+      {products.length === 0 ? <p className="mt-6 text-sm text-muted">No products yet.</p> : null}
       <ul className="mt-6 space-y-4">
         {products.map((product) => (
           <li key={product.code} className="grid gap-4 rounded-3xl bg-raise p-4 sm:grid-cols-[8rem_minmax(0,1fr)]">

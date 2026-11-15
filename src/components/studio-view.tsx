@@ -16,7 +16,7 @@ type Draft = {
 
 export function StudioView({ session }: { session: Session }) {
   const [products, setProducts] = useState<StudioProduct[]>([]);
-  const [productCode, setProductCode] = useState("lamp");
+  const [productCode, setProductCode] = useState("");
   const [style, setStyle] = useState("morning light, quiet desk");
   const [output, setOutput] = useState<"image" | "caption" | "script">("caption");
   const [draft, setDraft] = useState<Draft | null>(null);

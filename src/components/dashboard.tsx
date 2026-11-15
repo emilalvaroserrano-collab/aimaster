@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Bot, Briefcase, ImageIcon, MessageSquare, Wrench, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { HomeUpload } from "@/components/community-feed";
@@ -120,17 +119,9 @@ export function Dashboard() {
   const percent = Math.round((finished / totalLessons) * 100);
   const level = percent >= 70 ? "Advanced" : percent >= 30 ? "Learner" : "Beginner";
   const firstName = desk.profile.name?.split(" ")[0] || "there";
-  const categories = [
-    { label: "Prompting Basics", icon: MessageSquare, id: "projects" },
-    { label: "AI for Work", icon: Briefcase, id: "cursor" },
-    { label: "Content Creation", icon: ImageIcon, id: "product" },
-    { label: "Automation", icon: Zap, id: "n8n" },
-    { label: "Chatbots", icon: Bot, id: "ollama" },
-    { label: "Best Tools", icon: Wrench, id: "evals" },
-  ];
   return (
-    <div className="mx-auto max-w-3xl px-4 py-4 md:px-8">
-      <article className="overflow-hidden rounded-3xl bg-black">
+    <div className="mx-auto max-w-3xl px-4 py-5 md:px-8">
+      <article className="media-card overflow-hidden rounded-[1.6rem] bg-black">
         <video
           src="/reels/welcome.mp4"
           controls
@@ -138,15 +129,15 @@ export function Dashboard() {
           autoPlay
           muted
           loop
-          className="mx-auto max-h-[78dvh] w-full bg-black object-contain"
+          className="aspect-video w-full bg-black object-contain"
         />
-        <div className="bg-raise px-4 py-3">
-          <p className="text-[11px] font-medium tracking-wide text-teal">WELCOME</p>
+        <div className="bg-raise px-4 py-3.5">
+          <p className="text-[11px] font-medium tracking-[0.18em] text-teal">WELCOME</p>
           <h2 className="mt-1 font-display text-2xl">Welcome to AI Master Plan</h2>
-          <p className="text-xs text-muted">A short note from Emil before the lessons.</p>
+          <p className="text-sm text-muted">A short note from Emil before the lessons.</p>
         </div>
       </article>
-      {session ? <HomeUpload session={session} name={desk.profile.name || firstName} /> : null}
+      {session ? <div className="mt-4"><HomeUpload session={session} name={desk.profile.name || firstName} /></div> : null}
       <form
         className="mt-4"
         onSubmit={(event) => {
@@ -156,50 +147,38 @@ export function Dashboard() {
           window.location.assign(q ? `/learn?q=${encodeURIComponent(q)}` : "/learn");
         }}
       >
-        <input name="q" placeholder="Search lessons, tools, or topics..." className="h-12 w-full rounded-2xl border border-line bg-raise px-4" />
+        <input name="q" placeholder="Search lessons, tools, or topics" className="h-12 w-full rounded-2xl border border-white/8 bg-raise px-4" />
       </form>
 
-      <section className="mt-5 rounded-3xl border border-line bg-raise p-4">
+      <section className="surface-card mt-5 rounded-[1.4rem] p-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-medium">Your Progress</h2>
-          <p className="text-sm text-teal">Level: {level}</p>
+          <h2 className="text-base font-medium">Your progress</h2>
+          <p className="rounded-full bg-teal/15 px-2.5 py-1 text-xs font-medium text-teal">{level}</p>
         </div>
         <div className="mt-3 flex items-center gap-3">
           <Ring value={percent} />
           <p className="text-sm text-muted">
-            <span className="text-lg font-medium text-fg">{percent}%</span>
-            <span className="mt-1 block">{finished} of {totalLessons} lessons completed</span>
+            <span className="text-2xl font-medium tracking-tight text-fg">{percent}%</span>
+            <span className="mt-0.5 block">{finished} of {totalLessons} lessons completed</span>
           </p>
         </div>
-      </section>
-
-      <section className="mt-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-medium">Categories</h2>
-          <Link to="/learn" className="text-sm text-teal">See All</Link>
-        </div>
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          {categories.map((item) => (
-            <Link key={item.label} to="/learn/$tutorialId" params={{ tutorialId: item.id }} className="rounded-2xl border border-line bg-raise px-2 py-4 text-center">
-              <item.icon className="mx-auto size-5 text-teal" />
-              <p className="mt-2 text-xs">{item.label}</p>
-            </Link>
-          ))}
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-surface">
+          <div className="h-full rounded-full bg-teal" style={{ width: `${percent}%` }} />
         </div>
       </section>
 
       <section className="mt-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-medium">Master Piece</h2>
+          <h2 className="text-base font-medium">Master piece</h2>
           <Link to="/csr" className="text-sm text-teal">Open</Link>
         </div>
-        <Link to="/csr" className="mt-3 block rounded-2xl border border-line bg-raise p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-teal">Step by step</p>
-          <p className="mt-1 text-base font-medium">Creating a CSR Agent</p>
+        <Link to="/csr" className="surface-card mt-3 block rounded-[1.4rem] p-4">
+          <p className="text-[11px] font-medium tracking-[0.18em] text-teal">STEP BY STEP</p>
+          <p className="mt-1 text-lg font-medium">Creating a CSR Agent</p>
           <p className="mt-1 text-sm text-muted">A preset agent you can use, sell, or rent. You only fill the facts that belong to the business.</p>
         </Link>
       </section>
-      <p className="mt-4 text-center text-xs text-muted">Today’s pick swaps in <Countdown /></p>
+      <p className="mt-5 text-center text-xs text-muted">Today’s pick swaps in <Countdown /></p>
     </div>
   );
 }

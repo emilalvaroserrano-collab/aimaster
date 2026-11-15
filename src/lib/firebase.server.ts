@@ -499,10 +499,21 @@ export async function postLedger(input: {
   return { applied: true, balance: next.walletBalance };
 }
 
+async function rdel(path: string) {
+  const res = await fetch(`${BASE}${path}.json`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Could not save.");
+}
+
 async function seedTutorials() {
   const version = await rget<number>("/tutorialCatalogVersion");
   if (version === CATALOG_VERSION) return;
-  await Promise.all(CATALOG.map((tutorial) => rput(`/tutorials/${tutorial.id}`, tutorial)));
+  const existing = await rget<Record<string, unknown>>("/tutorials");
+  const keep = new Set(CATALOG.map((tutorial) => tutorial.id));
+  const stale = Object.keys(existing ?? {}).filter((id) => !keep.has(id));
+  await Promise.all([
+    ...CATALOG.map((tutorial) => rput(`/tutorials/${tutorial.id}`, tutorial)),
+    ...stale.map((id) => rdel(`/tutorials/${id}`)),
+  ]);
   await rput("/tutorialCatalogVersion", CATALOG_VERSION);
 }
 

@@ -103,14 +103,13 @@ export function Player({
           {tutorial.difficulty} · {tutorial.durationMin} min
         </p>
         <h1 className="mt-1 font-display text-4xl">{tutorial.title}</h1>
-        <div className="mt-4 overflow-hidden rounded-3xl bg-raise">
+        <div className="media-card mt-4 overflow-hidden rounded-[1.4rem] bg-black">
           <video
             ref={videoRef}
             poster={tutorial.thumbnail}
-            muted
-            loop
+            controls
             playsInline
-            className="aspect-video w-full object-cover"
+            className="aspect-video w-full bg-black object-contain"
           />
         </div>
         <div className="mt-4 flex items-center gap-3">

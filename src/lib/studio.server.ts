@@ -100,6 +100,11 @@ async function rput(path: string, value: unknown) {
   if (!res.ok) throw new Error("Could not save.");
 }
 
+async function rdel(path: string) {
+  const res = await fetch(`${BASE}${path}.json`, { method: "DELETE" });
+  if (!res.ok) throw new Error("Could not save.");
+}
+
 function nid(prefix: string) {
   return `${prefix}_${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
 }
@@ -111,10 +116,25 @@ async function member(idToken: string) {
 }
 
 async function ensureCatalog() {
+  const cleared = await rget<boolean>("/mockProductsCleared");
+  if (!cleared) {
+    await Promise.all(["lamp", "notebook", "headset", "course-kit"].map((code) => rdel(`/products/${code}`)));
+    await rput("/mockProductsCleared", true);
+  }
   const existing = await rget<Record<string, StudioProduct>>("/products");
   if (existing && Object.keys(existing).length > 0) return;
+  if (PRODUCT_CATALOG.length === 0) {
+    const stored = await rget("/commissionPolicies/default");
+    if (!stored) await rput("/commissionPolicies/default", DEFAULT_POLICY);
+    return;
+  }
   await Promise.all(PRODUCT_CATALOG.map((product) => rput(`/products/${product.code}`, product)));
   await rput("/commissionPolicies/default", DEFAULT_POLICY);
+}
+
+async function ensureSeedPosts() {
+  await Promise.all(["seed_projects", "seed_voice", "seed_product"].map((id) => rdel(`/contentPosts/${id}`)));
+  await rput("/studioSeeded", true);
 }
 
 async function policy() {
@@ -123,91 +143,6 @@ async function policy() {
     creatorShareBps: stored?.creatorShareBps ?? DEFAULT_POLICY.creatorShareBps,
     affiliateMemberShareBps: stored?.affiliateMemberShareBps ?? DEFAULT_POLICY.affiliateMemberShareBps,
   };
-}
-
-async function ensureSeedPosts() {
-  const flag = await rget<boolean>("/studioSeeded");
-  if (flag) {
-    await refreshSeedCopy();
-    return;
-  }
-  const now = Date.now();
-  const samples: Array<Pick<ContentPost, "id" | "title" | "caption" | "mediaUrl" | "posterUrl" | "durationSec" | "kind">> = [
-    {
-      id: "seed_projects",
-      title: "How to set up ChatGPT Projects",
-      caption: `Open Projects, write three instructions, and add only the files the chat should use. ${DISCLOSURE}`,
-      mediaUrl: "/reels/projects.mp4",
-      posterUrl: "/covers/projects.jpg",
-      durationSec: 12,
-      kind: "video",
-    },
-    {
-      id: "seed_voice",
-      title: "How to use ChatGPT voice",
-      caption: `Write the first twenty seconds, ask one question, then wait. ${DISCLOSURE}`,
-      mediaUrl: "/reels/voice.mp4",
-      posterUrl: "/covers/voice.jpg",
-      durationSec: 12,
-      kind: "video",
-    },
-    {
-      id: "seed_product",
-      title: "How to prompt a product image",
-      caption: `One object, one light, no stray text. Generate it in ChatGPT, then reject the misses. ${DISCLOSURE}`,
-      mediaUrl: "/covers/product.jpg",
-      posterUrl: "/covers/product.jpg",
-      durationSec: 0,
-      kind: "image",
-    },
-  ];
-  for (const sample of samples) {
-    const post: ContentPost = {
-      ...sample,
-      creatorId: "desk",
-      creatorName: "Daily Connect desk",
-      creatorCode: "DESK",
-      hashtags: "#DailyConnect",
-      productCode: sample.kind === "image" ? "course-kit" : "",
-      affiliatePath: "",
-      disclosure: DISCLOSURE,
-      rightsConfirmed: true,
-      status: "approved",
-      flags: [],
-      moderatorNote: "Seeded desk reel.",
-      destinations: {
-        tiktok: { status: "needs_connection", url: "", error: "Official TikTok account is not connected.", attempts: 0 },
-        youtube: { status: "needs_connection", url: "", error: "Official YouTube account is not connected.", attempts: 0 },
-        facebook: { status: "needs_connection", url: "", error: "Official Facebook Page is not connected.", attempts: 0 },
-      },
-      createdAt: now,
-      updatedAt: now,
-    };
-    await rput(`/contentPosts/${post.id}`, post);
-  }
-  await rput("/studioSeeded", true);
-}
-
-async function refreshSeedCopy() {
-  const copy: Record<string, { title: string; caption: string }> = {
-    seed_projects: {
-      title: "How to set up ChatGPT Projects",
-      caption: `Open Projects, write three instructions, and add only the files the chat should use. ${DISCLOSURE}`,
-    },
-    seed_voice: {
-      title: "How to use ChatGPT voice",
-      caption: `Write the first twenty seconds, ask one question, then wait. ${DISCLOSURE}`,
-    },
-    seed_product: {
-      title: "How to prompt a product image",
-      caption: `One object, one light, no stray text. Generate it in ChatGPT, then reject the misses. ${DISCLOSURE}`,
-    },
-  };
-  for (const [id, next] of Object.entries(copy)) {
-    const post = await rget<ContentPost>(`/contentPosts/${id}`);
-    if (!post) continue;
-    await rput(`/contentPosts/${id}`, { ...post, ...next, updatedAt: Date.now() });
-  }
 }
 
 function asPosts(raw: Record<string, ContentPost> | null) {

@@ -144,7 +144,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <div className="app-frame relative text-fg">
-      <header className="relative z-20 flex shrink-0 flex-col border-b border-line bg-canvas pt-[env(safe-area-inset-top)]">
+      <header className="relative z-20 flex shrink-0 flex-col border-b border-white/8 bg-canvas/95 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
         <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-3 md:h-auto md:gap-4 md:px-8 md:py-3 md:pt-[max(0.75rem,env(safe-area-inset-top))]">
         <Link to="/" aria-label="Home" className="shrink-0 md:hidden">
           <Logo compact />
@@ -266,7 +266,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <SponsorBar />
       </header>
       <div className="app-scroll">{children}</div>
-      <nav aria-label="Main" className="z-20 grid shrink-0 grid-cols-5 border-t border-line bg-raise pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav aria-label="Main" className="z-20 grid shrink-0 grid-cols-5 border-t border-white/8 bg-[#121212]/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-12px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl md:hidden">
         {bottomTabs.map((tab) => {
           const active = tab.exact ? pathname === tab.to : pathname.startsWith(tab.to);
           return (
